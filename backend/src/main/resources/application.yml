@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:slotmind;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  h2:
+    console.enabled: true
+server:
+  port: 8080
+llm:
+  base-url: ${LLM_BASE_URL:https://litellm-qc.zycus.net/v1}
+  api-key: ${LLM_API_KEY:}
+  model: ${LLM_MODEL:qwen-cursor}
+scheduling:
+  strategy: ${SCHEDULING_STRATEGY:rule}
