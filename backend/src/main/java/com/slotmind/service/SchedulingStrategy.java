@@ -3,6 +3,7 @@ package com.slotmind.service;
 import com.slotmind.domain.Appointment;
 import com.slotmind.domain.Slot;
 import com.slotmind.domain.TriggerReason;
+import com.slotmind.domain.SuggestionSource;
 import java.util.List;
 
 /**
@@ -11,6 +12,6 @@ import java.util.List;
 public interface SchedulingStrategy {
     List<SchedulingRecommendation> recommend(Appointment appointment, TriggerReason triggerReason);
 
-    record SchedulingRecommendation(Slot slot, double confidence, String reasoning) {
+    record SchedulingRecommendation(Slot slot, double confidence, String reasoning, SuggestionSource source) {
     }
 }

@@ -14,11 +14,13 @@ public class RescheduleSuggestion {
     @Column(length = 2000) private String reasoning;
     @Enumerated(EnumType.STRING) private SuggestionStatus status;
     @Enumerated(EnumType.STRING) private TriggerReason triggerReason;
+    @Enumerated(EnumType.STRING) private SuggestionSource source;
     public RescheduleSuggestion(Appointment appointment, Slot slot, Provider alternateProvider,
-                                 double confidence, String reasoning, TriggerReason triggerReason) {
+                                 double confidence, String reasoning, TriggerReason triggerReason,
+                                 SuggestionSource source) {
         this.appointment = appointment; this.recommendedSlot = slot; this.alternateProvider = alternateProvider;
         this.confidence = confidence; this.reasoning = reasoning; this.status = SuggestionStatus.PENDING;
-        this.triggerReason = triggerReason;
+        this.triggerReason = triggerReason; this.source = source;
     }
     public void accept() { status = SuggestionStatus.ACCEPTED; }
     public void reject() { status = SuggestionStatus.REJECTED; }

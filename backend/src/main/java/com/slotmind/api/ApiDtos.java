@@ -25,8 +25,11 @@ public final class ApiDtos {
             String providerId, String slotId, LocalDateTime startTime, AppointmentStatus status) {
     }
 
+    public record ProviderResponse(String id, String name, ProviderSpecialty specialty, ProviderStatus status) {
+    }
+
     public record SuggestionResponse(String id, String appointmentId, String recommendedSlotId,
             String alternateProviderId, double confidence, String reasoning,
-            SuggestionStatus status, TriggerReason triggerReason) {
+            SuggestionStatus status, TriggerReason triggerReason, SuggestionSource source) {
     }
 }

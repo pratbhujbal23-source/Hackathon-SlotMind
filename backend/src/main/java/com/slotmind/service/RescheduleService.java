@@ -10,7 +10,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 public class RescheduleService {
@@ -54,7 +53,7 @@ public class RescheduleService {
         p.setStatus(status);
         providers.save(p);
         if (status == ProviderStatus.OFFLINE)
-            CompletableFuture.runAsync(() -> asyncTarget().generateForProvider(p, TriggerReason.PROVIDER_OFFLINE));
+            asyncTarget().generateForProvider(p, TriggerReason.PROVIDER_OFFLINE);
     }
 
     @Transactional
@@ -63,20 +62,20 @@ public class RescheduleService {
         s.setStatus(status);
         slots.save(s);
         if (status == SlotStatus.CANCELLED)
-            CompletableFuture.runAsync(() -> asyncTarget().generateForAppointment(s, TriggerReason.SLOT_CANCELLED));
+            asyncTarget().generateForAppointment(s, TriggerReason.SLOT_CANCELLED);
     }
 
     private RescheduleService asyncTarget() {
         return asyncService == null ? this : asyncService;
     }
 
-    @Async
+    @Async("rescheduleExecutor")
     @Transactional
     public void generateForProvider(Provider p, TriggerReason reason) {
         appointments.findByProviderAndStatus(p, AppointmentStatus.CONFIRMED).forEach(a -> generate(a, reason));
     }
 
-    @Async
+    @Async("rescheduleExecutor")
     @Transactional
     public void generateForAppointment(Slot s, TriggerReason reason) {
         appointments.findByProviderAndStatus(s.getProvider(), AppointmentStatus.CONFIRMED).stream()
@@ -98,8 +97,12 @@ public class RescheduleService {
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No replacement slot available"));
         Slot candidate = recommendation.slot();
+        Slot currentCandidate = slots.findById(candidate.getId())
+                .orElseThrow(() -> new IllegalStateException("Recommended slot no longer exists"));
+        if (currentCandidate.getStatus() != SlotStatus.OPEN)
+            throw new IllegalStateException("Recommended slot is no longer available");
         return suggestions.save(new RescheduleSuggestion(a, candidate, candidate.getProvider(),
-                recommendation.confidence(), recommendation.reasoning(), reason));
+                recommendation.confidence(), recommendation.reasoning(), reason, recommendation.source()));
     }
 
     @Transactional
@@ -129,5 +132,9 @@ public class RescheduleService {
 
     public List<RescheduleSuggestion> suggestions(SuggestionStatus status) {
         return status == null ? suggestions.findAll() : suggestions.findByStatus(status);
+    }
+
+    public List<Provider> providers() {
+        return providers.findAll();
     }
 }

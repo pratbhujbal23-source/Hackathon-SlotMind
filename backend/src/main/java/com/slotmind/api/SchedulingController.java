@@ -28,6 +28,13 @@ public class SchedulingController {
         return service.appointments(status).stream().map(this::toResponse).toList();
     }
 
+    @GetMapping("/providers")
+    public List<ProviderResponse> providers() {
+        return service.providers().stream()
+                .map(p -> new ProviderResponse(p.getId(), p.getName(), p.getSpecialty(), p.getStatus()))
+                .toList();
+    }
+
     @PatchMapping("/providers/{id}/status")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void provider(@PathVariable String id, @Valid @RequestBody StatusRequest r) {
@@ -66,6 +73,6 @@ public class SchedulingController {
     private SuggestionResponse toSuggestion(RescheduleSuggestion s) {
         return new SuggestionResponse(s.getId(), s.getAppointment().getId(), s.getRecommendedSlot().getId(),
                 s.getAlternateProvider() == null ? null : s.getAlternateProvider().getId(), s.getConfidence(),
-                s.getReasoning(), s.getStatus(), s.getTriggerReason());
+                s.getReasoning(), s.getStatus(), s.getTriggerReason(), s.getSource());
     }
 }

@@ -32,7 +32,7 @@ public class RuleBasedSchedulingStrategy implements SchedulingStrategy {
 
         return candidates.stream()
                 .map(slot -> new SchedulingRecommendation(slot, confidence(slot, original, reason),
-                        reasoning(slot, original, reason)))
+                        reasoning(slot, original, reason), SuggestionSource.RULE))
                 .toList();
     }
 

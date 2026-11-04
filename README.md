@@ -32,6 +32,7 @@ Appointment and slots are updated transactionally
 - Runtime switching between rule-based and AI strategies
 - Automatic provider-offline and slot-cancelled recovery
 - Duplicate pending suggestion prevention
+- Suggestion provenance (`AI`, `AI_FALLBACK`, or `RULE`)
 - Transactional suggestion acceptance
 - Replacement-slot validation to prevent double-booking
 - Seed data for a complete live walkthrough
@@ -141,6 +142,10 @@ mvn spring-boot:run
 The AI strategy sends appointment context, trigger reason, provider information, and validated available-slot candidates to `/chat/completions`.
 
 If the LLM is unavailable, returns invalid JSON, or recommends an invalid slot, SlotMind falls back to the rule-based strategy.
+
+Suggestions expose their source so the dashboard can distinguish a real AI recommendation from a deterministic rule or an AI fallback.
+
+See [ADR.md](ADR.md) for the strategy, async loop, validation, transactional acceptance, and sprint-scope decisions.
 
 ## Scheduling strategies
 
